@@ -43,9 +43,13 @@ class OrnamentConfig:
         self.invert_heightmap = config_dict.get('invert_heightmap', False)
         
         # Image mapping controls
-        self.image_scale = config_dict.get('image_scale', 1.0)  # Scale factor for zooming
+        self.image_scale = config_dict.get('image_scale', 1.0)  # Base scale factor for zooming
+        self.image_scale_x = config_dict.get('image_scale_x', 1.0)  # Horizontal multiplier (multiplied with image_scale)
+        self.image_scale_y = config_dict.get('image_scale_y', 1.0)  # Vertical multiplier (multiplied with image_scale)
+        self.latitude_correction = config_dict.get('latitude_correction', 0.0)  # Spherical distortion correction (0.0-1.0)
         self.image_offset_x = config_dict.get('image_offset_x', 0.0)  # Horizontal offset (0.0-1.0)
         self.image_offset_y = config_dict.get('image_offset_y', 0.0)  # Vertical offset (0.0-1.0)
+        self.image_rotation = config_dict.get('image_rotation', 0.0)  # Rotation in degrees (0-360)
         self.image_tiling = config_dict.get('image_tiling', True)  # Whether to tile/wrap image
         
         # Top hole for hanging
@@ -78,8 +82,12 @@ class OrnamentConfig:
             'image_height': self.image_height,
             'invert_heightmap': self.invert_heightmap,
             'image_scale': self.image_scale,
+            'image_scale_x': self.image_scale_x,
+            'image_scale_y': self.image_scale_y,
+            'latitude_correction': self.latitude_correction,
             'image_offset_x': self.image_offset_x,
             'image_offset_y': self.image_offset_y,
+            'image_rotation': self.image_rotation,
             'image_tiling': self.image_tiling,
             'add_top_hole': self.add_top_hole,
             'top_hole_diameter': self.top_hole_diameter,
@@ -192,8 +200,13 @@ class OrnamentGenerator:
             # Image is taller - fit by height
             base_scale = 1.0
         
-        # Combine base auto-fit with user scale
-        effective_scale = base_scale * self.config.image_scale
+        # Determine effective scaling for x and y
+        # Combine: base_scale (auto-fit) * image_scale (user zoom) * scale_x/y (stretch/squash)
+        effective_scale_x = base_scale * self.config.image_scale * self.config.image_scale_x
+        effective_scale_y = self.config.image_scale * self.config.image_scale_y
+        
+        # Convert rotation from degrees to 0-1 range (normalized to longitude)
+        rotation_offset = (self.config.image_rotation % 360) / 360.0
         
         # Generate vertices
         for j in range(res_lat):
@@ -203,10 +216,23 @@ class OrnamentGenerator:
                 u = i / res_lon
                 v = j / res_lat
                 
+                # Apply rotation by offsetting u coordinate
+                u = (u + rotation_offset) % 1.0
+                
+                # Calculate latitude-based correction factor
+                # At equator (phi=π/2), sin(phi)=1 (no correction needed)
+                # Near poles (phi→0 or π), sin(phi)→0 (maximum correction needed)
+                phi_val = phi[j]
+                sin_phi = np.sin(phi_val)
+                # Avoid division by zero at poles and blend correction strength
+                if sin_phi < 0.01:
+                    sin_phi = 0.01
+                latitude_factor = 1.0 + self.config.latitude_correction * (1.0 / sin_phi - 1.0)
+                
                 # Apply effective scale (auto-fit + user adjustment) - center the scaling
                 # Divide by scale: <1.0 zooms out (samples more), >1.0 zooms in (samples less)
-                u_scaled = (u - 0.5) / effective_scale + 0.5
-                v_scaled = (v - 0.5) / effective_scale + 0.5
+                u_scaled = (u - 0.5) / (effective_scale_x * latitude_factor) + 0.5
+                v_scaled = (v - 0.5) / effective_scale_y + 0.5
                 
                 # Apply offset
                 u_scaled += self.config.image_offset_x

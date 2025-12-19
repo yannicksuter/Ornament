@@ -23,11 +23,45 @@ image_width: 200            # Width to resize image before processing (pixels)
 image_height: 200           # Height to resize image before processing (pixels)
 invert_heightmap: false     # true = invert light/dark mapping, false = normal
 
-# Image mapping controls (how image is positioned/sized on sphere)
-image_scale: 1.0            # 1.0 = auto-fit, <1.0 = zoom out, >1.0 = zoom in
-image_offset_x: 0.0         # Horizontal shift: -1.0 (left) to 1.0 (right)
-image_offset_y: 0.0         # Vertical shift: -1.0 (up) to 1.0 (down)
-image_tiling: true          # true = tile/repeat image, false = black (max thickness) beyond bounds
+# ┌─────────────────────────────────────────────────────────────────┐
+# │  Image Mapping Controls (how image wraps around the sphere)    │
+# └─────────────────────────────────────────────────────────────────┘
+
+# Scaling (zoom and stretch)
+#   ╭───────╮  scale=1.0   ╭───────────╮  scale=0.5   ╭─────╮
+#   │ Image │  ────────▶   │   Image   │  ────────▶   │ Img │
+#   ╰───────╯  (auto-fit)  ╰───────────╯  (zoom out)  ╰─────╯
+image_scale: 1.0            # Base zoom: 1.0 = auto-fit, <1.0 = zoom out, >1.0 = zoom in
+image_scale_x: 1.0          # Width multiplier: 1.0 = normal, 2.0 = stretch 2x wide, 0.5 = squeeze to half
+image_scale_y: 1.0          # Height multiplier: 1.0 = normal, 2.0 = stretch 2x tall, 0.5 = squeeze to half
+
+# Latitude correction (compensate for spherical distortion)
+#   Without correction (0.0):     With correction (1.0):
+#        Top (pole)                     Top (pole)
+#     ╭──( o )──╮                    ╭───(o)───╮
+#    │  <-W->   │ narrow            │  <-w->   │ narrow
+#    │ <--W-->  │ wider             │  <-w->   │ corrected
+#   ═╪═<---W--->╪═ equator         ═╪═<--w-->═╪═ equator (less stretch)
+#    │ <--W-->  │ wider             │  <-w->   │ corrected
+#    │  <-W->   │ narrow            │  <-w->   │ narrow
+#     ╰─────────╯                    ╰─────────╯
+latitude_correction: 0.0    # 0.0 = no fix (stretched at equator), 1.0 = full fix (uniform sampling)
+
+# Position offsets
+image_offset_x: 0.0         # Horizontal shift: -1.0 = left, 0.0 = center, 1.0 = right
+image_offset_y: 0.0         # Vertical shift: -1.0 = up, 0.0 = center, 1.0 = down
+
+# Rotation (where the image starts horizontally around the sphere)
+#   rotation=0°         rotation=90°        rotation=180°
+#      Front               Front                Front
+#   ╭────[A]────╮      ╭────[D]────╮       ╭────[C]────╮
+#   │ B       D │      │ A       C │       │ D       B │
+#   │     C     │      │     B     │       │     A     │
+#   ╰───────────╯      ╰───────────╯       ╰───────────╯
+image_rotation: 0.0         # Degrees: 0-360 (controls where slicer starts cutting each layer)
+
+# Tiling behavior
+image_tiling: true          # true = repeat/tile image, false = black (thick) beyond image edges
 
 # Top hole for hanging
 add_top_hole: true          # true = add hole at top, false = no hole

@@ -68,25 +68,80 @@ Inverts the light/dark mapping. Set to `true` if your image appears reversed. De
 ### Image Mapping Controls
 
 **`image_scale`**  
-Controls zoom level. Default: 1.0
+Base zoom level. Default: 1.0
 - `1.0` = auto-fit (image sized to sphere with correct aspect ratio)
 - `< 1.0` = zoom out (e.g., 0.5 shows image at half size)
 - `> 1.0` = zoom in (e.g., 2.0 magnifies image 2x)
 
+```
+  ╭───────╮  scale=1.0   ╭───────────╮  scale=0.5   ╭─────╮
+  │ Image │  ────────▶   │   Image   │  ────────▶   │ Img │
+  ╰───────╯  (auto-fit)  ╰───────────╯  (zoom out)  ╰─────╯
+```
+
+**`image_scale_x`**  
+Width multiplier applied on top of `image_scale`. Default: 1.0
+- `1.0` = no change
+- `2.0` = stretch horizontally 2x
+- `0.5` = squeeze to half width
+
+**`image_scale_y`**  
+Height multiplier applied on top of `image_scale`. Default: 1.0
+- `1.0` = no change
+- `2.0` = stretch vertically 2x
+- `0.5` = squeeze to half height
+
+**`latitude_correction`**  
+Compensates for spherical distortion where images stretch more at the equator than at poles. Default: 0.0
+
+```
+Without correction (0.0):     With correction (1.0):
+     Top (pole)                    Top (pole)
+  ╭──( o )──╮                   ╭───(o)───╮
+ │  <-W->   │ narrow           │  <-w->   │ narrow
+ │ <--W-->  │ wider            │  <-w->   │ uniform
+═╪═<---W--->╪═ equator        ═╪═<--w-->═╪═ uniform
+ │ <--W-->  │ wider            │  <-w->   │ uniform
+ │  <-W->   │ narrow           │  <-w->   │ narrow
+  ╰─────────╯                   ╰─────────╯
+```
+
+- `0.0` = no correction (equator stretched horizontally)
+- `1.0` = full correction (uniform sampling across all latitudes)
+- `0.5` = partial correction (good starting point)
+
 **`image_offset_x`**  
 Horizontal positioning. Range: -1.0 to 1.0. Default: 0.0
-- Negative values shift left
-- Positive values shift right
+- `-1.0` = shift left
+- `0.0` = centered
+- `1.0` = shift right
 
 **`image_offset_y`**  
 Vertical positioning. Range: -1.0 to 1.0. Default: 0.0
-- Negative values shift up
-- Positive values shift down
+- `-1.0` = shift up
+- `0.0` = centered
+- `1.0` = shift down
+
+**`image_rotation`**  
+Rotates the image around the sphere (controls where 3D printer slicing starts). Default: 0.0
+
+```
+rotation=0°         rotation=90°        rotation=180°
+   Front               Front                Front
+╭────[A]────╮      ╭────[D]────╮       ╭────[C]────╮
+│ B       D │      │ A       C │       │ D       B │
+│     C     │      │     B     │       │     A     │
+╰───────────╯      ╰───────────╯       ╰───────────╯
+```
+
+- `0` = default orientation
+- `180` = rotated to opposite side (useful for printer seam positioning)
+- Any value 0-360 degrees
 
 **`image_tiling`** (true/false)  
-Controls behavior when zoomed out. Default: true
+Controls behavior when zoomed out or image doesn't cover full sphere. Default: true
 - `true` = image repeats/tiles to fill the sphere
-- `false` = areas beyond image bounds become black (max thickness)
+- `false` = areas beyond image bounds become black (max thickness, blocks light)
 
 ### Top Hole (for hanging)
 

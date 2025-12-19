@@ -18,14 +18,21 @@ __pycache__/
 
 # Project specific
 *.stl
+output/
+
+# Images (user pictures)
+images/
 *.png
 *.jpg
-*.obj
+*.jpeg
+*.gif
+*.bmp
+*.tiff
 test_images/
-output/
 
 # OS
 .DS_Store
 Thumbs.db
 
+# Personal test configs
 configs/test.yaml
