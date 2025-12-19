@@ -1,0 +1,6 @@
+numpy
+pillow
+numpy-stl
+scipy
+matplotlib
+pyyaml

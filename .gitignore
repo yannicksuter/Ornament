@@ -1,0 +1,31 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Project specific
+*.stl
+*.png
+*.jpg
+*.obj
+test_images/
+output/
+
+# OS
+.DS_Store
+Thumbs.db
+
+configs/test.yaml

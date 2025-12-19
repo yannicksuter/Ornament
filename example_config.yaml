@@ -1,0 +1,42 @@
+# Example configuration for Christmas ball ornament generation
+# Copy this file and modify values to create your own ornaments
+
+# Basic information
+name: snowflake_ornament
+description: Christmas ornament with snowflake pattern
+
+# Input image and output paths
+image_path: path/to/your/image.jpg
+output_path: snowflake_ornament.stl
+
+# Ornament dimensions (in mm)
+diameter: 80.0              # Outer diameter of the spherical ornament
+min_thickness: 1.0          # Minimum wall thickness for brightest image areas (lets most light through)
+max_thickness: 3.0          # Maximum wall thickness for darkest image areas (blocks light)
+
+# Mesh resolution (higher = more detailed but slower generation)
+resolution_lat: 100         # Latitude resolution (vertical detail)
+resolution_lon: 100         # Longitude resolution (horizontal detail)
+
+# Image processing settings
+image_width: 200            # Width to resize image before processing (pixels)
+image_height: 200           # Height to resize image before processing (pixels)
+invert_heightmap: false     # true = invert light/dark mapping, false = normal
+
+# Image mapping controls (how image is positioned/sized on sphere)
+image_scale: 1.0            # 1.0 = auto-fit, <1.0 = zoom out, >1.0 = zoom in
+image_offset_x: 0.0         # Horizontal shift: -1.0 (left) to 1.0 (right)
+image_offset_y: 0.0         # Vertical shift: -1.0 (up) to 1.0 (down)
+image_tiling: true          # true = tile/repeat image, false = black (max thickness) beyond bounds
+
+# Top hole for hanging
+add_top_hole: true          # true = add hole at top, false = no hole
+top_hole_diameter: 5.0      # Diameter of the top circular opening (mm)
+top_hole_height: 10.0       # How deep the hole extends into the sphere (mm)
+
+# Bottom hole for LED/wiring (flat opening)
+add_bottom_hole: false      # true = add hole at bottom for LED access, false = no hole
+bottom_hole_diameter: 5.0   # Diameter of the bottom circular opening (mm)
+
+# Metadata (auto-generated if not specified)
+created_at: '2025-12-18T00:00:00'
